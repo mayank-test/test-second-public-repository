@@ -1,0 +1,16 @@
+linters:
+  enable:
+    - bodyclose
+    - goconst
+    - gofmt
+    - goimports
+    - golint
+    - gomnd
+    - scopelint
+    - unconvert
+    - unparam
+    - whitespace
+
+output:
+  format: line-number
+

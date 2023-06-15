@@ -1,0 +1,72 @@
+{
+  "router": {
+    "config": {
+      "releaseMode": true,
+      "middleware": [
+        {
+          "name": "ddog",
+          "enabled": true
+        },
+        {
+          "name": "reqLogger",
+          "config": {
+            "notlogged": [
+              "/ping",
+              "/debug/vars"
+            ]
+          },
+          "enabled": true
+        },
+        {
+          "name": "errHandler",
+          "enabled": true
+        },
+        {
+          "name": "bugsnag",
+          "enabled": true
+        }
+      ]
+    }
+  },
+  "grpcServer": {
+    "config": {
+      "host": "0.0.0.0",
+      "middleware": [
+        {
+          "name": "ddog",
+          "enabled": true
+        },
+        {
+          "name": "reqLogger",
+          "config": {
+            "notlogged": [
+              "/grpc.health.v1.Health/Check"
+            ]
+          },
+          "enabled": true
+        },
+        {
+          "name": "recoverHandler",
+          "enabled": true
+        },
+        {
+          "name": "bugsnag",
+          "enabled": true
+        },
+        {
+          "name": "protoValidator",
+          "enabled": true
+        }
+      ]
+    }
+  },
+  "bugsnag": {
+    "enabled": true
+  },
+  "datadog": {
+    "enabled": true
+  },
+  "envBindings": {
+    "datadog.config.apm.hostname": {"env": "DD_AGENT_HOST"}
+  }
+}

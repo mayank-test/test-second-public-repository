@@ -1,0 +1,116 @@
+{
+  "appName": "service_template",
+  "httpServer": {
+    "config": {
+      "host": "0.0.0.0",
+      "port": 8080
+    },
+    "enabled": true
+  },
+  "router": {
+    "config": {
+      "mode": "release",
+      "middleware": [
+        {"name": "ddog"},
+        {
+          "name": "reqLogger",
+          "config": {
+            "notlogged": ["/ping"]
+          }
+        },
+        {"name": "errHandler"},
+        {"name": "bugsnag"}
+      ]
+    },
+    "enabled": true
+  },
+  "grpcServer": {
+    "config": {
+      "host": "0.0.0.0",
+      "port": 8081,
+      "reflection": false,
+      "maxRecvMsgSizeBytes": 4194304,
+      "connectionTimeoutSec": 120,
+      "middleware": [
+        {
+          "name": "ddog",
+          "enabled": false
+        },
+        {
+          "name": "reqLogger",
+          "enabled": true
+        },
+        {
+          "name": "recoverHandler",
+          "enabled": false
+        },
+        {
+          "name": "bugsnag",
+          "enabled": false
+        },
+        {
+          "name": "protoValidator",
+          "enabled": true
+        }
+      ]
+    },
+    "enabled":true
+  },
+  "bugsnag": {
+    "config": {
+      "apiKey": "",
+      "projectPackages": [
+        "main*",
+        "github.com/watchtowerai/service_template/*"
+      ],
+      "releaseStage": "production",
+      "appType": ""
+    }
+  },
+  "postgres": {
+    "comment": "You may delete this postgres config if you are not using postgres. Certs are required for AWS RDS in versions of postgres 15+ in order to connect connect. Working with AWS RDS Certs: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.SSL.html",
+    "config": {
+      "port": 5432,
+      "host": "",
+      "migrationPath": "db/migrations/",
+      "username": "postgres",
+      "sslMode": "verify-full",
+      "database": "service_template",
+      "migrationTableName": "schema_migrations",
+      "stepsEnabled": false,
+      "migrationVarName": "x-migrations-table",
+      "rootCertPath": "./config/us-west-2-bundle.pem"
+    }
+  },
+  "zap": {
+    "config": {
+      "level": "info",
+      "encoding": "json",
+      "outputPaths": [
+        "stdout"
+      ],
+      "errorOutputPaths": [
+        "stderr"
+      ],
+      "development": false,
+      "encoderConfig": {
+        "messageKey": "msg",
+        "levelKey": "level",
+        "levelEncoder": "lowercase"
+      },
+      "sampling": {
+        "initial": 100,
+        "thereafter": 100
+      }
+    },
+    "enabled": true
+  },
+  "datadog": {
+    "config": {
+      "apm": {
+        "hostname": "127.0.0.1"
+      }
+    },
+    "enabled": false
+  }
+}

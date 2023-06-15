@@ -1,0 +1,102 @@
+version: 2.1
+
+# edit these two params for your service
+app-parameters: &parameters
+  CONTAINER_DEPLOY_NAME: engineering/service-template
+  CONTAINER_BUILD_NAME: service_template
+
+ensure_head: &ensure_head
+  when:
+    condition:
+      not: << pipeline.git.tag >>
+    steps:
+      - run: ensure_head
+
+jobs:
+  build_v2:
+    executor: ci-container
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - *ensure_head
+      - run:
+          name: build docker
+          command: ci build
+      - run:
+          name: test docker
+          command: ci run --rm ${CONTAINER_BUILD_NAME}_build make test
+      - run:
+          name: clean up docker
+          command: clean_up_reusable_docker
+      - run:
+          name: tag docker container
+          command: make dockertag
+      - run:
+          name: push docker container to ecr
+          command: |
+            export AWS_ECR_REPO_URL="$ECR_AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$CONTAINER_DEPLOY_NAME"
+            export IMAGE_NAME="watchtowerai/$CONTAINER_BUILD_NAME"
+            push_image_to_ecr $CIRCLE_TAG
+
+  update_tf:
+    executor: ci-container
+    parameters:
+      env:
+        type: string
+    steps:
+      - checkout
+      - *ensure_head
+      - run:
+          command: update_tf
+          environment:
+            AWS_ENV: << parameters.env >>
+
+infra-parameters: &infra-parameters
+  AWS_REGION: us-west-2
+  ECR_AWS_ACCOUNT_ID: "930465113464"
+  INFRASTRUCTURE_REPO: watchtowerai/infrastructure-live
+  GIT_EMAIL: engineering@nightfall.ai
+  GIT_USER: nightfall-eng
+
+executors:
+  ci-container:
+    docker:
+      - image: $ECR_AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/devops/circleci:v0.0.26
+        aws_auth:
+          aws_access_key_id: $AWS_ACCESS_KEY_ID
+          aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
+    environment:
+      <<: *infra-parameters
+      <<: *parameters
+workflows:
+  version: 2
+  build_test_deploy_v2:
+    jobs:
+      - build_v2:
+          filters:
+            tags:
+              only: /.*/
+          context: build_v2
+      - update_tf:
+          name: update_tf_stage
+          requires:
+            - build_v2
+          filters:
+            branches:
+              only:
+                - master
+                - main
+          env: stage
+          context: build_v2
+      - update_tf:
+          name: update_tf_prod
+          requires:
+            - build_v2
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v\d+\.\d+\.\d+/
+          env: prod
+          context: build_v2

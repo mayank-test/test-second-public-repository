@@ -1,0 +1,43 @@
+{
+    "router": {
+        "config": {
+            "releaseMode": false,
+            "middleware": [
+                {"name": "ddog", "enabled":  false},
+                {"name": "reqLogger", "enabled":  true},
+                {"name": "errHandler", "enabled":  true},
+                {"name": "bugsnag", "enabled":  false}
+            ]
+        }
+    },
+    "postgres": {
+        "config": {
+            "database": "service_template_local",
+            "password": "password",
+            "host": "localhost",
+            "port": 5432,
+            "migrationPath": "../db/migrations",
+            "sslMode": "disable",
+            "rootCertPath": ""
+        }
+    },
+    "zap": {
+        "config": {
+            "level": "debug",
+            "encoding": "console",
+            "outputPaths": [
+                "stdout"
+            ],
+            "errorOutputPaths": [
+                "stderr"
+            ],
+            "development": true
+        }
+    },
+    "grpcServer": {
+        "config": {
+            "reflection": true
+        }
+      }
+}
+
