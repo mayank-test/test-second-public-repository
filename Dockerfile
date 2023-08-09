@@ -1,4 +1,4 @@
-FROM golang:1.20-bullseye as builder
+FROM golang:1.21-bullseye as builder
 # Username and password to use basic auth and download the repo.
 # Recommend using engbot for this
 ARG GIT_USER
