@@ -15,7 +15,7 @@ jobs:
       - name: Granting private modules access
         run: |
           git config --global url."https://${{ secrets.engbot_token }}:x-oauth-basic@github.com/watchtowerai".insteadOf "https://github.com/watchtowerai"
-      - uses: reviewdog/action-golangci-lint@v2.3
+      - uses: reviewdog/action-golangci-lint@v2.4
         with:
           github_token: ${{ secrets.github_token }}
           level: "warning"
