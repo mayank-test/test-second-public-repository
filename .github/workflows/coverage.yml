@@ -9,7 +9,7 @@ jobs:
       - name: Granting private modules access
         run: |
           git config --global url."https://${{ secrets.engbot_token }}:x-oauth-basic@github.com/watchtowerai".insteadOf "https://github.com/watchtowerai"
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v4
         with:
           go-version-file: go.mod
